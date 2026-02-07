@@ -4,6 +4,8 @@ import com.urlshortener.urlshotener.Entites.URLRecord;
 import com.urlshortener.urlshotener.Repository.urlShortenerRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class URLShortenerService {
     private final urlShortenerRepository urlShortener;
@@ -13,16 +15,26 @@ public class URLShortenerService {
         this.urlShortener = urlShortener;
     }
 
-    public boolean saveURLRecord(String longURL, String shortURL){
+    public URLRecord saveURLRecord(String longURL){
         try {
-            URLRecord record = new URLRecord(longURL,shortURL);
-            this.urlShortener.save(record);
-            return true;
+            URLRecord record = new URLRecord(longURL);
+            return this.urlShortener.save(record);
         }
         catch (Exception e){
             System.out.println("Error occurred - " + e.getMessage());
-            return false;
+            return null;
         }
 
+    }
+
+    public String getLongURL(long id){
+        try{
+            Optional<URLRecord> record = this.urlShortener.findById(id);
+            return record.map(URLRecord::getLongURL).orElse("");
+        }
+        catch (Exception e){
+            System.out.println("Error occurred while retrieving long URL for id "+id);
+            return "";
+        }
     }
 }
